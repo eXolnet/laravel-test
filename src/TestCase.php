@@ -1,10 +1,15 @@
 <?php namespace Exolnet\Test;
 
+use Closure;
 use Exception;
 use Exolnet\Test\Traits\AssertionsTrait;
 use Faker\Factory as FakerFactory;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Schema\{Blueprint, SQLiteBuilder};
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Fluent;
 use Mockery as m;
 
 abstract class TestCase extends BaseTestCase {
@@ -42,7 +47,13 @@ abstract class TestCase extends BaseTestCase {
 	 */
 	protected $baseUrl = 'http://localhost';
 
-	/**
+	public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        $this->hotfixSqlite();
+    }
+
+    /**
 	 * Creates the application.
 	 *
 	 * @return \Illuminate\Foundation\Application
@@ -76,7 +87,7 @@ abstract class TestCase extends BaseTestCase {
 	/**
 	 * @throws \Exception
 	 */
-	public function setUp()
+	public function setUp(): void
 	{
 		parent::setUp();
 
@@ -98,10 +109,11 @@ abstract class TestCase extends BaseTestCase {
 		self::bootModels();
 	}
 
-	/**
-	 * @return void
-	 */
-	public function tearDown()
+    /**
+     * @return void
+     * @throws \Throwable
+     */
+	public function tearDown(): void
 	{
 		if ( ! self::$migrationFailed) {
 			DB::disconnect();
@@ -171,4 +183,29 @@ abstract class TestCase extends BaseTestCase {
 
 		return $mockInstance;
 	}
+
+    private function hotfixSqlite()
+    {
+        Connection::resolverFor('sqlite', function ($connection, $database, $prefix, $config) {
+            return new class($connection, $database, $prefix, $config) extends SQLiteConnection {
+                public function getSchemaBuilder()
+                {
+                    if ($this->schemaGrammar === null) {
+                        $this->useDefaultSchemaGrammar();
+                    }
+                    return new class($this) extends SQLiteBuilder {
+                        protected function createBlueprint($table, Closure $callback = null)
+                        {
+                            return new class($table, $callback) extends Blueprint {
+                                public function dropForeign($index)
+                                {
+                                    return new Fluent();
+                                }
+                            };
+                        }
+                    };
+                }
+            };
+        });
+    }
 }
