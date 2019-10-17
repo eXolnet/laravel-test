@@ -122,20 +122,18 @@ trait AssertionsTrait {
 		$this->assertSessionHas('notice_'.$type);
 	}
 
-	/**
-	 * Asserts if two arrays have similar values, sorting them before the fact
-	 * in order to "ignore" ordering.
-	 *
-	 * @param array $actual
-	 * @param array $expected
-	 * @param string $message
-	 * @param float $delta
-	 * @param int $depth
-	 */
-	protected function assertArrayValuesEquals(array $expected, array $actual, $message = '', $delta = 0.0, $depth = 10)
-	{
-		$this->assertEquals($expected, $actual, $message, $delta, $depth, true);
-	}
+    /**
+     * Asserts if two arrays have similar values, sorting them before the fact
+     * in order to "ignore" ordering.
+     *
+     * @param array $expected
+     * @param array $actual
+     * @param string $message
+     */
+    protected function assertArrayValuesEquals(array $expected, array $actual, $message = '')
+    {
+        $this->assertEqualsCanonicalizing($expected, $actual, $message);
+    }
 
 	/**
 	 * @param string $selector
