@@ -19,28 +19,6 @@ use PHPUnit\Framework\Assert as PHPUnit;
  */
 abstract class TestCaseFunctional extends BaseTestCase
 {
-    public function __call($method, $args)
-    {
-        // Setup AJAX query
-        $isAjaxQuery = false;
-        if (Str::endsWith($method, 'Ajax')) {
-            $method = substr($method, 0, -strlen('Ajax'));
-            $isAjaxQuery = true;
-        }
-
-        if (in_array($method, ['get', 'post', 'put', 'patch', 'delete'])) {
-            array_unshift($args, $method);
-            if ($isAjaxQuery) {
-                call_user_func_array([$this, 'json'], $args);
-            } else {
-                call_user_func_array([$this, 'call'], $args);
-            }
-            return $this->response;
-        }
-
-        throw new BadMethodCallException();
-    }
-
     protected function displayErrors()
     {
         $errors = $this->app['session.store']->get('notice_error');
