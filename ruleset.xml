@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<ruleset name="PSR2 for Laravel">
+    <file>src</file>
+
+    <rule ref="PSR2" />
+</ruleset>
