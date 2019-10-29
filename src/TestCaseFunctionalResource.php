@@ -1,220 +1,223 @@
-<?php namespace Exolnet\Test;
+<?php
 
-abstract class TestCaseFunctionalResource extends TestCaseFunctional {
-	/**
-	 * @return string
-	 */
-	public abstract function getBasePath();
+namespace Exolnet\Test;
 
-	/**
-	 * @return string
-	 */
-	public abstract function getController();
+abstract class TestCaseFunctionalResource extends TestCaseFunctional
+{
+    /**
+     * @return string
+     */
+    public abstract function getBasePath();
 
-	public function getTestedActions()
-	{
-		return ['index', 'create', 'store', 'edit', 'update', 'destroy'];
-	}
+    /**
+     * @return string
+     */
+    public abstract function getController();
 
-	//==========================================================================
-	// Index
-	//==========================================================================
+    public function getTestedActions()
+    {
+        return ['index', 'create', 'store', 'edit', 'update', 'destroy'];
+    }
 
-	public function testIndexRouteExists()
-	{
-		$this->checkTested('index');
+    //==========================================================================
+    // Index
+    //==========================================================================
 
-		$this->assertRouteExists('GET', $this->getBasePath());
-		$this->assertRouteMatchesAction('GET', $this->getBasePath(), $this->getController().'@index');
-	}
+    public function testIndexRouteExists()
+    {
+        $this->checkTested('index');
 
-	public function testIndexGet()
-	{
-		$this->checkTested('index');
+        $this->assertRouteExists('GET', $this->getBasePath());
+        $this->assertRouteMatchesAction('GET', $this->getBasePath(), $this->getController() . '@index');
+    }
 
-		$this->get($this->getBasePath());
+    public function testIndexGet()
+    {
+        $this->checkTested('index');
 
-		$this->assertResponseOk();
-	}
+        $this->get($this->getBasePath());
 
-	//==========================================================================
-	// Create
-	//==========================================================================
+        $this->assertResponseOk();
+    }
 
-	public function testCreateRouteExists()
-	{
-		$this->checkTested('create');
+    //==========================================================================
+    // Create
+    //==========================================================================
 
-		$this->assertRouteExists('GET', $this->getBasePath().'/create');
-		$this->assertRouteMatchesAction('GET', $this->getBasePath().'/create', $this->getController().'@create');
-	}
+    public function testCreateRouteExists()
+    {
+        $this->checkTested('create');
 
-	public function testCreateGet()
-	{
-		$this->checkTested('create');
+        $this->assertRouteExists('GET', $this->getBasePath() . '/create');
+        $this->assertRouteMatchesAction('GET', $this->getBasePath() . '/create', $this->getController() . '@create');
+    }
 
-		$this->get($this->getBasePath().'/create');
+    public function testCreateGet()
+    {
+        $this->checkTested('create');
 
-		$this->assertResponseOk();
-	}
+        $this->get($this->getBasePath() . '/create');
 
-	//==========================================================================
-	// Store
-	//==========================================================================
+        $this->assertResponseOk();
+    }
 
-	public function testStoreRouteExists()
-	{
-		$this->checkTested('store');
+    //==========================================================================
+    // Store
+    //==========================================================================
 
-		$this->assertRouteExists('POST', $this->getBasePath());
-		$this->assertRouteMatchesAction('POST', $this->getBasePath(), $this->getController().'@store');
-	}
+    public function testStoreRouteExists()
+    {
+        $this->checkTested('store');
 
-	public function testStorePost(array $data = [])
-	{
-		$this->checkTested('store');
+        $this->assertRouteExists('POST', $this->getBasePath());
+        $this->assertRouteMatchesAction('POST', $this->getBasePath(), $this->getController() . '@store');
+    }
 
-		$this->post($this->getBasePath(), $data);
+    public function testStorePost(array $data = [])
+    {
+        $this->checkTested('store');
 
-		$this->displayErrors();
-		$this->assertRedirectedTo($this->storeRedirect());
-		$this->assertNotice('success');
-	}
+        $this->post($this->getBasePath(), $data);
 
-	public function storeRedirect()
-	{
-		return $this->getBasePath();
-	}
+        $this->displayErrors();
+        $this->assertRedirectedTo($this->storeRedirect());
+        $this->assertNotice('success');
+    }
 
-	public function testStoreEmptyPost()
-	{
-		$this->checkTested('store');
+    public function storeRedirect()
+    {
+        return $this->getBasePath();
+    }
 
-		$this->post($this->getBasePath());
+    public function testStoreEmptyPost()
+    {
+        $this->checkTested('store');
 
-		$this->assertRedirectedTo($this->getBasePath().'/create');
-		$this->assertNotice('error');
-	}
+        $this->post($this->getBasePath());
 
-	//==========================================================================
-	// Edit
-	//==========================================================================
+        $this->assertRedirectedTo($this->getBasePath() . '/create');
+        $this->assertNotice('error');
+    }
 
-	public function testEditRouteExists()
-	{
-		$this->checkTested('edit');
+    //==========================================================================
+    // Edit
+    //==========================================================================
 
-		$this->assertRouteExists('GET', $this->getBasePath().'/1/edit');
-		$this->assertRouteMatchesAction('GET', $this->getBasePath().'/1/edit', $this->getController().'@edit');
-	}
+    public function testEditRouteExists()
+    {
+        $this->checkTested('edit');
 
-	public function testEditGet()
-	{
-		$this->checkTested('edit');
+        $this->assertRouteExists('GET', $this->getBasePath() . '/1/edit');
+        $this->assertRouteMatchesAction('GET', $this->getBasePath() . '/1/edit', $this->getController() . '@edit');
+    }
 
-		$this->get($this->getBasePath().'/1/edit');
+    public function testEditGet()
+    {
+        $this->checkTested('edit');
 
-		$this->assertResponseOk();
-	}
+        $this->get($this->getBasePath() . '/1/edit');
 
-	//==========================================================================
-	// Update
-	//==========================================================================
+        $this->assertResponseOk();
+    }
 
-	public function testUpdateRouteExists()
-	{
-		$this->checkTested('update');
+    //==========================================================================
+    // Update
+    //==========================================================================
 
-		$this->assertRouteExists('PUT', $this->getBasePath().'/1');
-		$this->assertRouteMatchesAction('PUT', $this->getBasePath().'/1', $this->getController().'@update');
-	}
+    public function testUpdateRouteExists()
+    {
+        $this->checkTested('update');
 
-	public function testUpdateMissingPost()
-	{
-		$this->checkTested('update');
+        $this->assertRouteExists('PUT', $this->getBasePath() . '/1');
+        $this->assertRouteMatchesAction('PUT', $this->getBasePath() . '/1', $this->getController() . '@update');
+    }
 
-		$this->expectResponseMissing();
+    public function testUpdateMissingPost()
+    {
+        $this->checkTested('update');
 
-		$this->put($this->getBasePath().'/0');
-	}
+        $this->expectResponseMissing();
 
-	public function testUpdatePost(array $data = [])
-	{
-		$this->checkTested('update');
+        $this->put($this->getBasePath() . '/0');
+    }
 
-		$this->put($this->getBasePath().'/1', $data);
+    public function testUpdatePost(array $data = [])
+    {
+        $this->checkTested('update');
 
-		$this->displayErrors();
-		$this->assertRedirectedTo($this->updateRedirect());
-		$this->assertNotice('success');
-	}
+        $this->put($this->getBasePath() . '/1', $data);
 
-	public function updateRedirect()
-	{
-		return $this->getBasePath();
-	}
+        $this->displayErrors();
+        $this->assertRedirectedTo($this->updateRedirect());
+        $this->assertNotice('success');
+    }
 
-	public function testUpdateEmptyPost()
-	{
-		$this->checkTested('update');
+    public function updateRedirect()
+    {
+        return $this->getBasePath();
+    }
 
-		$this->put($this->getBasePath().'/1');
+    public function testUpdateEmptyPost()
+    {
+        $this->checkTested('update');
 
-		$this->assertRedirectedTo($this->getBasePath().'/1/edit');
-		$this->assertNotice('error');
-	}
+        $this->put($this->getBasePath() . '/1');
 
-	public function testUpdateInvalidPost(array $data = [])
-	{
-		$this->checkTested('update');
+        $this->assertRedirectedTo($this->getBasePath() . '/1/edit');
+        $this->assertNotice('error');
+    }
 
-		$this->put($this->getBasePath().'/1', $data);
+    public function testUpdateInvalidPost(array $data = [])
+    {
+        $this->checkTested('update');
 
-		$this->assertRedirectedTo($this->getBasePath().'/1/edit');
-		$this->assertNotice('error');
-	}
+        $this->put($this->getBasePath() . '/1', $data);
 
-	//==========================================================================
-	// Destroy
-	//==========================================================================
+        $this->assertRedirectedTo($this->getBasePath() . '/1/edit');
+        $this->assertNotice('error');
+    }
 
-	public function testDestroyRouteExists()
-	{
-		$this->checkTested('destroy');
+    //==========================================================================
+    // Destroy
+    //==========================================================================
 
-		$this->assertRouteExists('DELETE', $this->getBasePath().'/1');
-		$this->assertRouteMatchesAction('DELETE', $this->getBasePath().'/1', $this->getController().'@destroy');
-	}
+    public function testDestroyRouteExists()
+    {
+        $this->checkTested('destroy');
 
-	public function testDestroyGet()
-	{
-		$this->checkTested('destroy');
+        $this->assertRouteExists('DELETE', $this->getBasePath() . '/1');
+        $this->assertRouteMatchesAction('DELETE', $this->getBasePath() . '/1', $this->getController() . '@destroy');
+    }
 
-		$this->delete($this->getBasePath().'/1');
+    public function testDestroyGet()
+    {
+        $this->checkTested('destroy');
 
-		$this->displayErrors();
-		$this->assertRedirectedTo($this->destroyRedirect());
-		$this->assertNotice('success');
-	}
+        $this->delete($this->getBasePath() . '/1');
 
-	public function destroyRedirect()
-	{
-		return $this->getBasePath();
-	}
+        $this->displayErrors();
+        $this->assertRedirectedTo($this->destroyRedirect());
+        $this->assertNotice('success');
+    }
 
-	public function testDestroyMissingGet()
-	{
-		$this->checkTested('destroy');
+    public function destroyRedirect()
+    {
+        return $this->getBasePath();
+    }
 
-		$this->expectResponseMissing();
+    public function testDestroyMissingGet()
+    {
+        $this->checkTested('destroy');
 
-		$this->delete($this->getBasePath().'/0');
-	}
+        $this->expectResponseMissing();
 
-	protected function checkTested($action)
-	{
-		if ( ! in_array($action, $this->getTestedActions())) {
-			$this->markTestSkipped('Action "'.$action.'" is not tested for this controller');
-		}
-	}
+        $this->delete($this->getBasePath() . '/0');
+    }
+
+    protected function checkTested($action)
+    {
+        if ( ! in_array($action, $this->getTestedActions())) {
+            $this->markTestSkipped('Action "' . $action . '" is not tested for this controller');
+        }
+    }
 }

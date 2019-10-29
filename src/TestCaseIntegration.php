@@ -1,6 +1,7 @@
-<?php namespace Exolnet\Test;
+<?php
+
+namespace Exolnet\Test;
 
 abstract class TestCaseIntegration extends TestCaseFunctional
 {
-
 }
