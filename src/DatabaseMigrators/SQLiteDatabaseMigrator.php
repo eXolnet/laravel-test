@@ -2,14 +2,15 @@
 
 namespace Exolnet\Test\DatabaseMigrators;
 
-use Artisan;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class SQLiteDatabaseMigrator extends DatabaseMigrator
 {
     protected $booted = false;
-    protected $filesytem;
+    protected $filesystem;
 
     protected $file;
     protected $cloneFile;
@@ -20,15 +21,15 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     public function __construct($file)
     {
         parent::__construct();
-        $this->filesystem = new Filesystem;
 
+        $this->filesystem = new Filesystem();
         $this->file = $file;
         $this->cloneFile = $this->getCloneFilename($this->file);
     }
 
     public function run()
     {
-        if ( ! $this->booted) {
+        if (! $this->booted) {
             $this->initialMigration();
             $this->booted = true;
         } else {
@@ -60,7 +61,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         $this->configurePragma();
 
         Artisan::call('migrate');
-        if (file_exists(base_path('database/seeds/TestSeeder.php'))) {
+        if (file_exists(App::basePath('database/seeds/TestSeeder.php'))) {
             Artisan::call('db:seed', ['--class' => 'TestSeeder']);
         }
 
@@ -94,6 +95,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     {
         $dirname = pathinfo($file, PATHINFO_DIRNAME);
         $filename = pathinfo($file, PATHINFO_BASENAME);
+
         return $dirname . '/_' . $filename;
     }
 
@@ -105,6 +107,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     protected function bomFileExists()
     {
         $bomFilename = $this->getBOMFilename($this->file);
+
         return $this->filesystem->exists($bomFilename);
     }
 
@@ -117,7 +120,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     protected function sqliteSignatureMatches()
     {
-        if ( ! $this->filesystem->exists($this->cloneFile)) {
+        if (! $this->filesystem->exists($this->cloneFile)) {
             return false;
         }
 
@@ -136,12 +139,13 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     protected function calculateFilesSignature()
     {
-        $files = glob(base_path('database/{migrations,seeds}/*.php'), GLOB_BRACE);
+        $files = glob(App::basePath('database/{migrations,seeds}/*.php'), GLOB_BRACE);
 
         $signature = '';
         foreach ($files as $file) {
             $signature .= sha1($this->filesystem->get($file));
         }
+
         return sha1($signature);
     }
 
@@ -149,6 +153,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     {
         $dirname = pathinfo($file, PATHINFO_DIRNAME);
         $filename = pathinfo($file, PATHINFO_BASENAME);
+
         return $dirname . '/' . $filename . '.json';
     }
 

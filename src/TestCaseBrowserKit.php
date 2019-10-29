@@ -5,9 +5,11 @@ namespace Exolnet\Test;
 use Exception;
 use Exolnet\Test\Traits\AssertionsTrait;
 use Faker\Factory as FakerFactory;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Laravel\BrowserKitTesting\TestCase as BrowserKitTestCase;
-use Mockery as m;
+use Mockery;
+use RuntimeException;
 
 abstract class TestCaseBrowserKit extends BrowserKitTestCase
 {
@@ -66,8 +68,8 @@ abstract class TestCaseBrowserKit extends BrowserKitTestCase
             }
         }
 
-        if ( ! $app) {
-            throw new \RuntimeException('Could not find bootstrap/app.php');
+        if (! $app) {
+            throw new RuntimeException('Could not find bootstrap/app.php');
         }
 
         $app->loadEnvironmentFrom('.env.testing');
@@ -80,7 +82,7 @@ abstract class TestCaseBrowserKit extends BrowserKitTestCase
     /**
      * @throws \Exception
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -105,11 +107,11 @@ abstract class TestCaseBrowserKit extends BrowserKitTestCase
     /**
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
-        if ( ! self::$migrationFailed) {
+        if (! self::$migrationFailed) {
             DB::disconnect();
-            m::close();
+            Mockery::close();
 
             $this->tearDownModels();
 
@@ -167,11 +169,11 @@ abstract class TestCaseBrowserKit extends BrowserKitTestCase
      */
     protected function mockAppInstance($abstract, $mockInstance = null)
     {
-        if ( ! $mockInstance) {
-            $mockInstance = m::mock($abstract);
+        if (! $mockInstance) {
+            $mockInstance = Mockery::mock($abstract);
         }
 
-        \App::instance($abstract, $mockInstance);
+        App::instance($abstract, $mockInstance);
 
         return $mockInstance;
     }

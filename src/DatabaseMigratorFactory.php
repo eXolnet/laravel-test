@@ -4,6 +4,7 @@ namespace Exolnet\Test;
 
 use Exolnet\Test\DatabaseMigrators\DatabaseMigrator;
 use Exolnet\Test\DatabaseMigrators\SQLiteDatabaseMigrator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Config;
 
 class DatabaseMigratorFactory
@@ -25,7 +26,7 @@ class DatabaseMigratorFactory
      */
     protected function isSQLite()
     {
-        return strcasecmp(array_get($this->getDefaultConnectionConfiguration(), 'driver', ''), 'sqlite') === 0;
+        return strcasecmp(Arr::get($this->getDefaultConnectionConfiguration(), 'driver', ''), 'sqlite') === 0;
     }
 
     /**
@@ -33,16 +34,19 @@ class DatabaseMigratorFactory
      */
     protected function getSQLiteFile()
     {
-        $file = array_get($this->getDefaultConnectionConfiguration(), 'database');
+        $file = Arr::get($this->getDefaultConnectionConfiguration(), 'database');
+
         if ($file === ':memory:') {
             return null;
         }
+
         return $file;
     }
 
     protected function getDefaultConnectionConfiguration()
     {
         $default = Config::get('database.default');
+
         return Config::get('database.connections.' . $default, []);
     }
 }

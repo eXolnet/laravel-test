@@ -3,20 +3,29 @@
 namespace Exolnet\Test;
 
 use Faker\Factory as FakerFactory;
-use Mockery as m;
-use PHPUnit\Framework\TestCase as TestCase;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class BaseTestCase extends TestCase
 {
+    /**
+     * @var \Faker\Generator
+     */
     protected $faker;
 
-    public function setUp()
+    /**
+     * This method is called before each test.
+     */
+    public function setUp(): void
     {
         $this->faker = FakerFactory::create();
     }
 
-    public function tearDown()
+    /**
+     * This method is called after each test.
+     */
+    public function tearDown(): void
     {
-        m::close();
+        Mockery::close();
     }
 }

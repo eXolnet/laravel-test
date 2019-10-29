@@ -2,8 +2,9 @@
 
 namespace Exolnet\Test\DatabaseMigrators;
 
-use Artisan;
-use Schema;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseMigrator
 {
@@ -20,7 +21,7 @@ class DatabaseMigrator
             Artisan::call('migrate:reset');
         }
         Artisan::call('migrate');
-        if (file_exists(base_path('database/seeds/TestSeeder.php'))) {
+        if (file_exists(App::basePath('database/seeds/TestSeeder.php'))) {
             Artisan::call('db:seed', ['--class' => 'TestSeeder']);
         }
     }

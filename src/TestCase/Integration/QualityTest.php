@@ -2,8 +2,9 @@
 
 namespace Exolnet\Test\TestCase\Integration;
 
-use App;
 use Exolnet\Test\TestCaseIntegration;
+use Illuminate\Support\Facades\App;
+use Illuminate\Support\Facades\Route;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class QualityTest extends TestCaseIntegration
@@ -33,7 +34,7 @@ class QualityTest extends TestCaseIntegration
 
     public function testError403()
     {
-        \Route::get('403', function () {
+        Route::get('403', function () {
             App::abort(403);
         });
 
@@ -45,7 +46,7 @@ class QualityTest extends TestCaseIntegration
 
     public function testError500()
     {
-        \Route::get('500', function () {
+        Route::get('500', function () {
             throw new HttpException(500);
         });
 
@@ -92,7 +93,7 @@ class QualityTest extends TestCaseIntegration
      */
     public function testCssSelectorCount()
     {
-        $path = public_path('**/*.css');
+        $path = App::make('path.public').'/**/*.css';
         $files = glob($path);
         $maxSelectorCount = 4095;
 
@@ -110,7 +111,11 @@ class QualityTest extends TestCaseIntegration
                 return $count + substr_count($selectors, ',') + 1;
             }, 0);
 
-            $this->assertTrue($selectorCount <= $maxSelectorCount, 'The CSS file "' . $file . '" has ' . $selectorCount . ' selectors. Having more than ' . $maxSelectorCount . ' selectors will causes problem on IE9.');
+            $this->assertTrue(
+                $selectorCount <= $maxSelectorCount,
+                'The CSS file "' . $file . '" has ' . $selectorCount . ' selectors. Having more than ' .
+                $maxSelectorCount . ' selectors will causes problem on IE9.'
+            );
         }
     }
 

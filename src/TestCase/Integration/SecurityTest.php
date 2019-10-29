@@ -3,6 +3,7 @@
 namespace Exolnet\Test\TestCase\Integration;
 
 use Exolnet\Test\TestCaseIntegration;
+use Illuminate\Support\Facades\App;
 
 class SecurityTest extends TestCaseIntegration
 {
@@ -41,7 +42,7 @@ class SecurityTest extends TestCaseIntegration
      */
     private function assertHeaderInHtaccess($name)
     {
-        $htaccessPath = public_path('.htaccess');
+        $htaccessPath = App::make('path.public').'/.htaccess';
 
         $this->assertTrue(file_exists($htaccessPath));
 

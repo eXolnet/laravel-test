@@ -4,20 +4,18 @@ namespace Exolnet\Test;
 
 use BadMethodCallException;
 use Exolnet\Test\TestCase as BaseTestCase;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
- * @method \Illuminate\Http\Response getAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [],
- *         $content = null)
- * @method \Illuminate\Http\Response postAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server =
- *         [], $content = null)
- * @method \Illuminate\Http\Response putAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [],
- *         $content = null)
- * @method \Illuminate\Http\Response patchAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server =
- *         [], $content = null)
- * @method \Illuminate\Http\Response deleteAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server =
- *         [], $content = null)
+ * phpcs:disable
+ * @method \Illuminate\Http\Response getAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+ * @method \Illuminate\Http\Response postAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+ * @method \Illuminate\Http\Response putAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+ * @method \Illuminate\Http\Response patchAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+ * @method \Illuminate\Http\Response deleteAjax($method, $uri, $parameters = [], $cookies = [], $files = [], $server = [], $content = null)
+ * phpcs:enable
  */
 abstract class TestCaseFunctional extends BaseTestCase
 {
@@ -25,7 +23,7 @@ abstract class TestCaseFunctional extends BaseTestCase
     {
         // Setup AJAX query
         $isAjaxQuery = false;
-        if (ends_with($method, 'Ajax')) {
+        if (Str::endsWith($method, 'Ajax')) {
             $method = substr($method, 0, -strlen('Ajax'));
             $isAjaxQuery = true;
         }
@@ -40,7 +38,7 @@ abstract class TestCaseFunctional extends BaseTestCase
             return $this->response;
         }
 
-        throw new BadMethodCallException;
+        throw new BadMethodCallException();
     }
 
     protected function displayErrors()
@@ -54,8 +52,9 @@ abstract class TestCaseFunctional extends BaseTestCase
 
     public function assertViewResponse($viewName = null)
     {
-        if ( ! isset($this->response->original) || ! $this->response->original instanceof View) {
-            return PHPUnit::assertTrue(false, 'The response was not a view.');
+        if (! isset($this->response->original) || ! $this->response->original instanceof View) {
+            PHPUnit::assertTrue(false, 'The response was not a view.');
+            return;
         }
 
         if ($viewName !== null) {

@@ -6,13 +6,17 @@ use Closure;
 use Exception;
 use Exolnet\Test\Traits\AssertionsTrait;
 use Faker\Factory as FakerFactory;
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Connection;
-use Illuminate\Database\Schema\{Blueprint, SQLiteBuilder};
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Schema\SQLiteBuilder;
 use Illuminate\Database\SQLiteConnection;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Fluent;
-use Mockery as m;
+use Mockery;
+use RuntimeException;
 
 abstract class TestCase extends BaseTestCase
 {
@@ -53,6 +57,7 @@ abstract class TestCase extends BaseTestCase
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
+
         $this->hotfixSqlite();
     }
 
@@ -76,18 +81,21 @@ abstract class TestCase extends BaseTestCase
             }
         }
 
-        if ( ! $app) {
-            throw new \RuntimeException('Could not find bootstrap/app.php');
+        if (! $app) {
+            throw new RuntimeException('Could not find bootstrap/app.php');
         }
 
         $app->loadEnvironmentFrom('.env.testing');
 
-        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        $app->make(Kernel::class)->bootstrap();
 
         return $app;
     }
 
     /**
+     * Setup the test environment.
+     *
+     * @return void
      * @throws \Exception
      */
     public function setUp(): void
@@ -113,14 +121,16 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
+     * Clean up the testing environment before the next test.
+     *
      * @return void
      * @throws \Throwable
      */
     public function tearDown(): void
     {
-        if ( ! self::$migrationFailed) {
+        if (! self::$migrationFailed) {
             DB::disconnect();
-            m::close();
+            Mockery::close();
 
             $this->tearDownModels();
 
@@ -178,11 +188,11 @@ abstract class TestCase extends BaseTestCase
      */
     protected function mockAppInstance($abstract, $mockInstance = null)
     {
-        if ( ! $mockInstance) {
-            $mockInstance = m::mock($abstract);
+        if (! $mockInstance) {
+            $mockInstance = Mockery::mock($abstract);
         }
 
-        \App::instance($abstract, $mockInstance);
+        App::instance($abstract, $mockInstance);
 
         return $mockInstance;
     }

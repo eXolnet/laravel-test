@@ -2,7 +2,6 @@
 
 namespace Exolnet\Test\Traits;
 
-use App\Providers\RouteServiceProvider;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;

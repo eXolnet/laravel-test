@@ -7,12 +7,12 @@ abstract class TestCaseFunctionalResource extends TestCaseFunctional
     /**
      * @return string
      */
-    public abstract function getBasePath();
+    abstract public function getBasePath();
 
     /**
      * @return string
      */
-    public abstract function getController();
+    abstract public function getController();
 
     public function getTestedActions()
     {
@@ -216,7 +216,7 @@ abstract class TestCaseFunctionalResource extends TestCaseFunctional
 
     protected function checkTested($action)
     {
-        if ( ! in_array($action, $this->getTestedActions())) {
+        if (! in_array($action, $this->getTestedActions())) {
             $this->markTestSkipped('Action "' . $action . '" is not tested for this controller');
         }
     }

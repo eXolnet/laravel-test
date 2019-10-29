@@ -3,6 +3,7 @@
 namespace Exolnet\Test\TestCase\Integration;
 
 use Exolnet\Test\TestCaseFunctional;
+use Illuminate\Support\Facades\App;
 
 class SeoTest extends TestCaseFunctional
 {
@@ -19,7 +20,10 @@ class SeoTest extends TestCaseFunctional
         $actualLength = strlen($title);
         $maximumLength = 55;
 
-        $this->assertTrue($actualLength <= $maximumLength, 'Page title should be lower than ' . $maximumLength . ' characters');
+        $this->assertTrue(
+            $actualLength <= $maximumLength,
+            'Page title should be lower than ' . $maximumLength . ' characters'
+        );
     }
 
     /**
@@ -34,7 +38,10 @@ class SeoTest extends TestCaseFunctional
         $actualLength = strlen($description);
         $maximumLength = 160;
 
-        $this->assertTrue($actualLength <= $maximumLength, 'Meta description should be lower than ' . $maximumLength . ' characters');
+        $this->assertTrue(
+            $actualLength <= $maximumLength,
+            'Meta description should be lower than ' . $maximumLength . ' characters'
+        );
     }
 
     /**
@@ -50,8 +57,8 @@ class SeoTest extends TestCaseFunctional
         $this->markTestIncomplete();
 
         // $this->visit('robot.txt')
-        // 	->see('User-agent: *')
-        // 	->see('Disallow:');
+        // ->see('User-agent: *')
+        // ->see('Disallow:');
     }
 
     public function testRobotsOnOtherEnvironmentsThanProduction()
@@ -213,7 +220,7 @@ class SeoTest extends TestCaseFunctional
      */
     public function testHumanTxt()
     {
-        $this->assertLink('author', asset('humans.txt'));
+        $this->assertLink('author', App::make('url')->asset('humans.txt'));
     }
 
     public function testLinkAlternate()
