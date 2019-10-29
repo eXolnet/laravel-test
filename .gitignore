@@ -1,6 +1,7 @@
 /vendor
 composer.phar
 composer.lock
+security-checker.phar
 .DS_Store
 .idea/
 phpunit.xml
