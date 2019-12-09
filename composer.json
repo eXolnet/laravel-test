@@ -1,13 +1,13 @@
 {
     "name": "exolnet/laravel-test",
     "description": "The eXolnet Laravel Test package.",
-    "license": "MIT",
     "keywords": [
         "exolnet",
         "laravel",
         "test"
     ],
     "homepage": "https://github.com/eXolnet/laravel-test",
+    "license": "MIT",
     "authors": [
         {
             "name": "Alexandre D'Eschambeault",
@@ -46,7 +46,6 @@
             "Exolnet\\Test\\Tests\\": "tests"
         }
     },
-    "minimum-stability": "stable",
     "scripts": {
         "audit": "php -r \"copy('https://get.sensiolabs.org/security-checker.phar', 'security-checker.phar');\" && php security-checker.phar security:check ./composer.lock",
         "lint": "vendor/bin/phpcs -p --standard=ruleset.xml",
@@ -55,7 +54,6 @@
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
     },
     "config": {
-        "sort-packages": true,
-        "optimize-autoloader": true
+        "sort-packages": true
     }
 }
