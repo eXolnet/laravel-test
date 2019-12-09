@@ -4,5 +4,6 @@ composer.lock
 security-checker.phar
 .DS_Store
 .idea/
+.phpunit.result.cache
 phpunit.xml
 Thumbs.db
