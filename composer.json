@@ -40,7 +40,9 @@
     },
     "autoload": {
         "psr-4": {
-            "Exolnet\\Test\\": ""
+            "Exolnet\\Test\\": "src/"
+        }
+    },
     "autoload-dev": {
         "psr-4": {
             "Exolnet\\Test\\Tests\\": "tests"
