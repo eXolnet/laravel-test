@@ -9,12 +9,20 @@
     ],
     "authors": [
         {
-            "name": "Tom Rochette",
-            "email": "trochette@exolnet.com"
+            "name": "Alexandre D'Eschambeault",
+            "email": "adeschambeault@exolnet.com"
+        },
+        {
+            "name": "Patrick Gagnon-Renaud",
+            "email": "pgrenaud@exolnet.com"
         },
         {
             "name": "Simon Gaudreau",
             "email": "sgaudreau@exolnet.com"
+        },
+        {
+            "name": "Tom Rochette",
+            "email": "trochette@exolnet.com"
         }
     ],
     "require": {
