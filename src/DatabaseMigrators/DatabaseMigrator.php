@@ -9,20 +9,43 @@ use Illuminate\Support\Facades\Schema;
 class DatabaseMigrator
 {
     /**
-     *
+     * @return void
      */
-    public function __construct()
-    {
-    }
-
-    public function run()
+    public function run(): void
     {
         if (Schema::hasTable('migrations')) {
             Artisan::call('migrate:reset');
         }
+
+        $this->freshDatabase();
+    }
+
+    /**
+     * @return void
+     */
+    protected function freshDatabase(): void
+    {
+        $this->migrateDatabase();
+        $this->seedTestData();
+    }
+
+    /**
+     * @return void
+     */
+    protected function migrateDatabase(): void
+    {
         Artisan::call('migrate');
-        if (file_exists(App::basePath('database/seeds/TestSeeder.php'))) {
-            Artisan::call('db:seed', ['--class' => 'TestSeeder']);
+    }
+
+    /**
+     * @return void
+     */
+    public function seedTestData(): void
+    {
+        if (! file_exists(App::basePath('database/seeds/TestSeeder.php'))) {
+            return;
         }
+
+        Artisan::call('db:seed', ['--class' => 'TestSeeder']);
     }
 }
