@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\Config;
 class DatabaseMigratorFactory
 {
     /**
-     * @return DatabaseMigrator|SQLiteDatabaseMigrator
+     * @return \Exolnet\Test\DatabaseMigrators\DatabaseMigrator
      */
-    public function create()
+    public function create(): DatabaseMigrator
     {
         if ($this->isSQLite() && $this->getSQLiteFile()) {
             return new SQLiteDatabaseMigrator($this->getSQLiteFile());
@@ -24,15 +24,15 @@ class DatabaseMigratorFactory
     /**
      * @return bool
      */
-    protected function isSQLite()
+    protected function isSQLite(): bool
     {
         return strcasecmp(Arr::get($this->getDefaultConnectionConfiguration(), 'driver', ''), 'sqlite') === 0;
     }
 
     /**
-     * @return mixed|null
+     * @return string|null
      */
-    protected function getSQLiteFile()
+    protected function getSQLiteFile(): ?string
     {
         $file = Arr::get($this->getDefaultConnectionConfiguration(), 'database');
 
@@ -43,7 +43,10 @@ class DatabaseMigratorFactory
         return $file;
     }
 
-    protected function getDefaultConnectionConfiguration()
+    /**
+     * @return array
+     */
+    protected function getDefaultConnectionConfiguration(): array
     {
         $default = Config::get('database.default');
 

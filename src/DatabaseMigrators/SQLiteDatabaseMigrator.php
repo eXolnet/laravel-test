@@ -9,25 +9,40 @@ use Illuminate\Support\Facades\DB;
 
 class SQLiteDatabaseMigrator extends DatabaseMigrator
 {
+    /**
+     * @var bool
+     */
     protected $booted = false;
+
+    /**
+     * @var \Illuminate\Filesystem\Filesystem
+     */
     protected $filesystem;
 
+    /**
+     * @var string
+     */
     protected $file;
+
+    /**
+     * @var string
+     */
     protected $cloneFile;
 
     /**
-     * @param $file
+     * @param string $file
      */
-    public function __construct($file)
+    public function __construct(string $file)
     {
-        parent::__construct();
-
         $this->filesystem = new Filesystem();
         $this->file = $file;
         $this->cloneFile = $this->getCloneFilename($this->file);
     }
 
-    public function run()
+    /**
+     * @return void
+     */
+    public function run(): void
     {
         if (! $this->booted) {
             $this->initialMigration();
@@ -37,7 +52,10 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         }
     }
 
-    protected function configurePragma()
+    /**
+     * @return void
+     */
+    protected function configurePragma(): void
     {
         // Enable foreign keys for the current connection/file
         DB::statement('PRAGMA foreign_keys = ON;');
@@ -47,6 +65,9 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         DB::statement('PRAGMA synchronous = OFF;');
     }
 
+    /**
+     * @return void
+     */
     protected function initialMigration()
     {
         $signature = $this->calculateFilesSignature();
@@ -60,17 +81,17 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
         $this->configurePragma();
 
-        Artisan::call('migrate');
-        if (file_exists(App::basePath('database/seeds/TestSeeder.php'))) {
-            Artisan::call('db:seed', ['--class' => 'TestSeeder']);
-        }
+        $this->freshDatabase();
 
         $this->filesystem->copy($this->file, $this->cloneFile);
 
         $this->generateBOM($signature);
     }
 
-    protected function restore()
+    /**
+     * @return void
+     */
+    protected function restore(): void
     {
         $this->filesystem->copy($this->cloneFile, $this->file);
 
@@ -78,9 +99,9 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     }
 
     /**
-     * @param $file
+     * @param string $file
      */
-    protected function emptyAndChmod($file)
+    protected function emptyAndChmod(string $file): void
     {
         if ($this->filesystem->put($file, '') !== false) {
             chmod($file, 0777);
@@ -88,10 +109,10 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     }
 
     /**
-     * @param $file
+     * @param string $file
      * @return string
      */
-    protected function getCloneFilename($file)
+    protected function getCloneFilename(string $file): string
     {
         $dirname = pathinfo($file, PATHINFO_DIRNAME);
         $filename = pathinfo($file, PATHINFO_BASENAME);
@@ -99,26 +120,40 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         return $dirname . '/_' . $filename;
     }
 
-    protected function canReuseClone($signature)
+    /**
+     * @param string $signature
+     * @return bool
+     */
+    protected function canReuseClone(string $signature): bool
     {
         return $this->bomFileExists() && $this->sqliteSignatureMatches() && $this->signatureMatches($signature);
     }
 
-    protected function bomFileExists()
+    /**
+     * @return bool
+     */
+    protected function bomFileExists(): bool
     {
         $bomFilename = $this->getBOMFilename($this->file);
 
         return $this->filesystem->exists($bomFilename);
     }
 
-    protected function signatureMatches($signature)
+    /**
+     * @param string $signature
+     * @return bool
+     */
+    protected function signatureMatches(string $signature): bool
     {
         $data = $this->getBOMData();
 
         return $signature === $data->files;
     }
 
-    protected function sqliteSignatureMatches()
+    /**
+     * @return bool
+     */
+    protected function sqliteSignatureMatches(): bool
     {
         if (! $this->filesystem->exists($this->cloneFile)) {
             return false;
@@ -131,13 +166,19 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         return $cloneFileHash === $data->sqlite;
     }
 
-    protected function getBOMData()
+    /**
+     * @return \stdClass
+     */
+    protected function getBOMData(): \stdClass
     {
         $bomFilename = $this->getBOMFilename($this->file);
         return json_decode($this->filesystem->get($bomFilename));
     }
 
-    protected function calculateFilesSignature()
+    /**
+     * @return string
+     */
+    protected function calculateFilesSignature(): string
     {
         $files = glob(App::basePath('database/{migrations,seeds}/*.php'), GLOB_BRACE);
 
@@ -149,7 +190,11 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         return sha1($signature);
     }
 
-    protected function getBOMFilename($file)
+    /**
+     * @param string $file
+     * @return string
+     */
+    protected function getBOMFilename(string $file): string
     {
         $dirname = pathinfo($file, PATHINFO_DIRNAME);
         $filename = pathinfo($file, PATHINFO_BASENAME);
@@ -157,7 +202,10 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         return $dirname . '/' . $filename . '.json';
     }
 
-    protected function generateBOM($signature)
+    /**
+     * @param string $signature
+     */
+    protected function generateBOM(string $signature): void
     {
         $data = [
             'files'  => $signature,

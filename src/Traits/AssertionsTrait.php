@@ -10,120 +10,6 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 trait AssertionsTrait
 {
-    public function assertViewExists($view_name, $message = 'The view %s was not found.')
-    {
-        try {
-            View::make($view_name);
-            $this->assertTrue(true);
-        } catch (InvalidArgumentException $e) {
-            $this->fail(sprintf($message, $view_name));
-        }
-    }
-
-    public function assertHttpException($expectedStatusCode, Closure $testCase)
-    {
-        try {
-            $testCase($this);
-
-            $this->assertFalse(true, "An HttpException should have been thrown by the provided Closure.");
-        } catch (HttpException $e) {
-            // assertResponseStatus() won't work because the response object is null
-            $this->assertEquals(
-                $expectedStatusCode,
-                $e->getStatusCode(),
-                sprintf("Expected an HTTP status of %d but got %d.", $expectedStatusCode, $e->getStatusCode())
-            );
-        }
-    }
-
-    public function expectResponseAccessDenied(Closure $testCase)
-    {
-        $this->assertHttpException(403, $testCase);
-    }
-
-    public function expectResponseMissing()
-    {
-        $this->setExpectedException('Symfony\Component\HttpKernel\Exception\NotFoundHttpException');
-    }
-
-    public function assertResponseContentType($expected)
-    {
-        $response = $this->response;
-
-        $actual = $response->headers->get('Content-type');
-
-        return $this->assertEquals($expected, $actual, 'Expected response ' . $expected . ', got ' . $actual . '.');
-    }
-
-    public function assertResponseJson()
-    {
-        return $this->assertResponseContentType('application/json');
-    }
-
-    public function assertRouteExists($method, $uri, $message = null)
-    {
-        $message = $message ?: sprintf('The route %s %s was not found.', strtoupper($method), $uri);
-
-        // Create a corresponding request
-        $request = Request::create($uri, $method);
-
-        // Match the request to a route
-        $route = $this->app['router']->getRoutes()->match($request);
-        $this->assertNotNull($route, $message);
-    }
-
-    /**
-     * @deprecated
-     */
-    public function assertRouteMatchesAction($method, $uri, $action, $message = null)
-    {
-        $this->assertTrue(true);
-    }
-
-    public function assertIsViewResponse($response)
-    {
-        $this->assertInstanceOf('Illuminate\View\View', $response);
-    }
-
-    public function assertIsRedirectResponse($response)
-    {
-        $this->assertInstanceOf('Illuminate\Http\RedirectResponse', $response);
-    }
-
-    public function assertResponseRedirectedTo($response, $uri, $with = [])
-    {
-        $this->assertIsRedirectResponse($response);
-
-        $this->assertEquals($this->app['url']->to($uri), $response->headers->get('Location'));
-
-        $this->assertSessionHasAll($with);
-    }
-
-    public function assertResponseRedirectedToRoute($response, $name, $parameters = [], $with = [])
-    {
-        $this->assertResponseRedirectedTo($response, $this->app['url']->route($name, $parameters), $with);
-    }
-
-    public function assertResponseRedirectedToAction($response, $name, $parameters = [], $with = [])
-    {
-        $this->assertResponseRedirectedTo($response, $this->app['url']->action($name, $parameters), $with);
-    }
-
-    public function assertIsJsonResponse($response)
-    {
-        $this->assertInstanceOf('Illuminate\Http\JsonResponse', $response);
-    }
-
-    public function assertIsStreamResponse($response)
-    {
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\StreamedResponse', $response);
-    }
-
-    public function assertNotice($type)
-    {
-        $this->assertSessionHas('notice_' . $type);
-    }
-
     /**
      * Asserts if two arrays have similar values, sorting them before the fact
      * in order to "ignore" ordering.
@@ -138,24 +24,112 @@ trait AssertionsTrait
     }
 
     /**
-     * @param string $selector
-     * @return $this
+     * @param string $view_name
+     * @param string $message
      */
-    public function seeSelector($selector)
+    public function assertViewExists(string $view_name, string $message = 'The view %s was not found.'): void
     {
-        $elements = $this->crawler->filter($selector);
-
-        $this->assertTrue(count($elements) > 0);
-
-        return $this;
+        try {
+            View::make($view_name);
+            $this->assertTrue(true);
+        } catch (InvalidArgumentException $e) {
+            $this->fail(sprintf($message, $view_name));
+        }
     }
 
     /**
-     * @param $kind
-     * @return \Exolnet\Test\Traits\AssertionsTrait
+     * @param string $method
+     * @param string $uri
+     * @param string $message
      */
-    public function seeAlert($kind)
+    public function assertRouteExists(
+        string $method,
+        string $uri,
+        string $message = 'The route %s %s was not found.'
+    ): void {
+        $message = $message ?: sprintf($message, strtoupper($method), $uri);
+
+        // Create a corresponding request
+        $request = Request::create($uri, $method);
+
+        // Match the request to a route
+        $route = $this->app['router']->getRoutes()->match($request);
+        $this->assertNotNull($route, $message);
+    }
+
+    /**
+     * @param mixed $response
+     */
+    public function assertIsViewResponse($response): void
     {
-        return $this->seeSelector('.alert.alert-' . $kind);
+        $this->assertInstanceOf(\Illuminate\Contracts\View\View::class, $response);
+    }
+
+    /**
+     * @param mixed $response
+     */
+    public function assertIsRedirectResponse($response): void
+    {
+        $this->assertInstanceOf(\Illuminate\Http\RedirectResponse::class, $response);
+    }
+
+    /**
+     * @param mixed $response
+     * @param string $uri
+     * @param array $with
+     */
+    public function assertResponseRedirectedTo($response, string $uri, array $with = [])
+    {
+        $this->assertIsRedirectResponse($response);
+
+        $this->assertEquals($this->app['url']->to($uri), $response->headers->get('Location'));
+
+        $this->assertSessionHasAll($with);
+    }
+
+    /**
+     * @param mixed $response
+     * @param string $name
+     * @param array $parameters
+     * @param array $with
+     */
+    public function assertResponseRedirectedToRoute(
+        $response,
+        string $name,
+        array $parameters = [],
+        array $with = []
+    ): void {
+        $this->assertResponseRedirectedTo($response, $this->app['url']->route($name, $parameters), $with);
+    }
+
+    /**
+     * @param mixed $response
+     * @param string $name
+     * @param array $parameters
+     * @param array $with
+     */
+    public function assertResponseRedirectedToAction(
+        $response,
+        string $name,
+        array $parameters = [],
+        array $with = []
+    ): void {
+        $this->assertResponseRedirectedTo($response, $this->app['url']->action($name, $parameters), $with);
+    }
+
+    /**
+     * @param mixed $response
+     */
+    public function assertIsJsonResponse($response): void
+    {
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+    }
+
+    /**
+     * @param mixed $response
+     */
+    public function assertIsStreamResponse($response)
+    {
+        $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
     }
 }
