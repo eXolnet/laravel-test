@@ -2,8 +2,10 @@
 
 namespace Exolnet\Test\Traits;
 
+use App\Providers\RouteServiceProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 
 trait AssertionsTrait
@@ -51,6 +53,41 @@ trait AssertionsTrait
         // Match the request to a route
         $route = $this->app['router']->getRoutes()->match($request);
         $this->assertNotNull($route, $message);
+    }
+
+    /**
+     * @param string      $method
+     * @param string      $uri
+     * @param string      $action
+     * @param string|null $message
+     */
+    public function assertRouteMatchesAction(string $method, string $uri, string $action, ?string $message = null): void
+    {
+        $message = $message ?: sprintf('The route %s %s does not match action %s.', strtoupper($method), $uri, $action);
+
+        // Create a corresponding request
+        $request = Request::create($uri, $method);
+
+        // Match the request to a route
+        /** @var \Illuminate\Routing\Route $route */
+        $route = $this->app['router']->getRoutes()->match($request);
+        if ($route === null) {
+            $this->assertNotNull($route, $message);
+            return;
+        }
+
+        /** @var \Illuminate\Foundation\Support\Providers\RouteServiceProvider $routeServiceProvider */
+        $routeServiceProvider = $this->app->getProvider(RouteServiceProvider::class);
+
+        $namespace = '';
+        if (method_exists($routeServiceProvider, 'getNamespace')) {
+            $namespace = $routeServiceProvider->getNamespace() . '\\';
+        }
+
+        $controller = $route->getAction()['controller'];
+        $routeAction = Str::startsWith($controller, '\\') ? $controller : '\\' . $controller;
+        $action = Str::startsWith($action, '\\') ? $action : '\\' . $namespace . $action;
+        $this->assertSame($routeAction, $action, $message);
     }
 
     /**
