@@ -16,36 +16,34 @@ trait AssertionsTrait
      * @param array  $actual
      * @param string $message
      */
-    protected function assertArrayValuesEquals(array $expected, array $actual, $message = '')
+    protected function assertArrayValuesEquals(array $expected, array $actual, string $message = ''): void
     {
         $this->assertEqualsCanonicalizing($expected, $actual, $message);
     }
 
     /**
-     * @param string $view_name
-     * @param string $message
+     * @param string $viewName
+     * @param string|null $message
      */
-    public function assertViewExists(string $view_name, string $message = 'The view %s was not found.'): void
+    public function assertViewExists(string $viewName, ?string $message = null): void
     {
         try {
-            View::make($view_name);
+            View::make($viewName);
             $this->assertTrue(true);
         } catch (InvalidArgumentException $e) {
-            $this->fail(sprintf($message, $view_name));
+            $message = $message ?: sprintf('The view %s was not found.', $viewName);
+            $this->fail($message);
         }
     }
 
     /**
      * @param string $method
      * @param string $uri
-     * @param string $message
+     * @param string|null $message
      */
-    public function assertRouteExists(
-        string $method,
-        string $uri,
-        string $message = 'The route %s %s was not found.'
-    ): void {
-        $message = $message ?: sprintf($message, strtoupper($method), $uri);
+    public function assertRouteExists(string $method, string $uri, ?string $message = null): void
+    {
+        $message = $message ?: sprintf('The route %s %s was not found.', strtoupper($method), $uri);
 
         // Create a corresponding request
         $request = Request::create($uri, $method);
@@ -76,7 +74,7 @@ trait AssertionsTrait
      * @param string $uri
      * @param array $with
      */
-    public function assertResponseRedirectedTo($response, string $uri, array $with = [])
+    public function assertResponseRedirectedTo($response, string $uri, array $with = []): void
     {
         $this->assertIsRedirectResponse($response);
 
@@ -126,7 +124,7 @@ trait AssertionsTrait
     /**
      * @param mixed $response
      */
-    public function assertIsStreamResponse($response)
+    public function assertIsStreamResponse($response): void
     {
         $this->assertInstanceOf(\Symfony\Component\HttpFoundation\StreamedResponse::class, $response);
     }
