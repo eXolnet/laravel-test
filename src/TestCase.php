@@ -25,6 +25,7 @@ abstract class TestCase extends LaravelTestCase
 
     /**
      * @return void
+     * @throws \Throwable
      */
     protected function setUp(): void
     {
@@ -42,27 +43,6 @@ abstract class TestCase extends LaravelTestCase
             throw $e;
         }
     }
-
-    // /**
-    //  * Clean up the testing environment before the next test.
-    //  *
-    //  * @return void
-    //  * @throws \Throwable
-    //  */
-    // public function tearDown(): void
-    // {
-    //     if (! self::$migrationFailed) {
-    //         DB::disconnect();
-    //         Mockery::close();
-    //
-    //         $this->tearDownModels();
-    //
-    //         $this->app->flush();
-    //         $this->app = null;
-    //     }
-    //
-    //     parent::tearDown();
-    // }
 
     /**
      * @return \Exolnet\Test\DatabaseMigrators\DatabaseMigrator

@@ -2,11 +2,9 @@
 
 namespace Exolnet\Test\Traits;
 
-use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View;
 use InvalidArgumentException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 trait AssertionsTrait
 {
