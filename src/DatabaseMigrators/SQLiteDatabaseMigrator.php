@@ -4,7 +4,6 @@ namespace Exolnet\Test\DatabaseMigrators;
 
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 
 class SQLiteDatabaseMigrator extends DatabaseMigrator
@@ -41,6 +40,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     /**
      * @return void
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function run(): void
     {
@@ -67,6 +67,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     /**
      * @return void
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function initialMigration()
     {
@@ -76,8 +77,8 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
             return;
         }
 
-        $this->emptyAndChmod($this->file, '');
-        $this->emptyAndChmod($this->cloneFile, '');
+        $this->emptyAndChmod($this->file);
+        $this->emptyAndChmod($this->cloneFile);
 
         $this->configurePragma();
 
@@ -123,6 +124,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     /**
      * @param string $signature
      * @return bool
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function canReuseClone(string $signature): bool
     {
@@ -142,6 +144,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     /**
      * @param string $signature
      * @return bool
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function signatureMatches(string $signature): bool
     {
@@ -152,6 +155,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     /**
      * @return bool
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function sqliteSignatureMatches(): bool
     {
@@ -168,6 +172,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     /**
      * @return \stdClass
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function getBOMData(): \stdClass
     {
@@ -177,6 +182,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     /**
      * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function calculateFilesSignature(): string
     {
@@ -204,6 +210,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     /**
      * @param string $signature
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function generateBOM(string $signature): void
     {
