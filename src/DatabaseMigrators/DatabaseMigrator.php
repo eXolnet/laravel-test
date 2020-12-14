@@ -42,7 +42,9 @@ class DatabaseMigrator
      */
     public function seedTestData(): void
     {
-        if (! file_exists(App::basePath('database/seeds/TestSeeder.php'))) {
+        if (! file_exists(App::basePath('database/seeds/TestSeeder.php')) &&
+            ! file_exists(App::basePath('database/seeders/TestSeeder.php'))
+        ) {
             return;
         }
 
