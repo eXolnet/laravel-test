@@ -78,8 +78,8 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
             return;
         }
 
-        $this->emptyAndChmod($this->file);
-        $this->emptyAndChmod($this->cloneFile);
+        $this->empty($this->file);
+        $this->empty($this->cloneFile);
 
         $this->configurePragma();
 
@@ -103,11 +103,9 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     /**
      * @param string $file
      */
-    protected function emptyAndChmod(string $file): void
+    protected function empty(string $file): void
     {
-        if ($this->filesystem->put($file, '') !== false) {
-            chmod($file, 0777);
-        }
+        $this->filesystem->put($file, '');
     }
 
     /**
