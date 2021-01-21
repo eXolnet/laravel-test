@@ -2,6 +2,7 @@
 
 namespace Exolnet\Test\DatabaseMigrators;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\DB;
@@ -163,7 +164,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
             return false;
         }
 
-        $cloneFileHash = sha1($this->filesystem->get($this->cloneFile));
+        $cloneFileHash = $this->hashFile($this->cloneFile);
 
         $data = $this->getBOMData();
 
@@ -190,7 +191,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
         $signature = '';
         foreach ($files as $file) {
-            $signature .= sha1($this->filesystem->get($file));
+            $signature .= $this->hashFile($file);
         }
 
         return sha1($signature);
@@ -216,8 +217,22 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     {
         $data = [
             'files'  => $signature,
-            'sqlite' => sha1($this->filesystem->get($this->cloneFile)),
+            'sqlite' => $this->hashFile($this->cloneFile),
         ];
         $this->filesystem->put($this->getBOMFilename($this->file), json_encode($data));
+    }
+
+    /**
+     * @param string $path
+     * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function hashFile(string $path): string
+    {
+        if (! $this->filesystem->isFile($path)) {
+            throw new FileNotFoundException("File does not exist at path {$path}");
+        }
+
+        return sha1_file($path);
     }
 }
