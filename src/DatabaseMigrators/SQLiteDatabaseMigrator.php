@@ -94,7 +94,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
      * @return void
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    protected function initialMigration()
+    protected function initialMigration(): void
     {
         if ($this->canReuseClone()) {
             $this->restore();
@@ -105,11 +105,9 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         $this->empty($this->cloneFile);
 
         $this->configurePragma();
-
         $this->freshDatabase();
 
         $this->filesystem->copy($this->file, $this->cloneFile);
-
         $this->generateBOM();
     }
 
@@ -125,6 +123,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
     /**
      * @param string $file
+     * @return void
      */
     protected function empty(string $file): void
     {
@@ -264,6 +263,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     }
 
     /**
+     * @return void
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function generateBOM(): void

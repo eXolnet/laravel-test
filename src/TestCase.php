@@ -50,7 +50,7 @@ abstract class TestCase extends LaravelTestCase
     protected function getDatabaseMigrator(): DatabaseMigrator
     {
         if (! self::$databaseMigrator) {
-            self::$databaseMigrator = (new DatabaseMigratorFactory)->create();
+            self::$databaseMigrator = (new DatabaseMigratorFactory())->create();
         }
 
         return self::$databaseMigrator;
