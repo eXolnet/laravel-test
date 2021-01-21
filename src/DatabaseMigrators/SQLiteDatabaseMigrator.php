@@ -119,7 +119,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         $dirname = pathinfo($file, PATHINFO_DIRNAME);
         $filename = pathinfo($file, PATHINFO_BASENAME);
 
-        return $dirname . '/_' . $filename;
+        return $dirname . DIRECTORY_SEPARATOR . '_' . $filename;
     }
 
     /**
@@ -206,7 +206,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         $dirname = pathinfo($file, PATHINFO_DIRNAME);
         $filename = pathinfo($file, PATHINFO_BASENAME);
 
-        return $dirname . '/' . $filename . '.json';
+        return $dirname . DIRECTORY_SEPARATOR . $filename . '.json';
     }
 
     /**
