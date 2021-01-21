@@ -35,6 +35,11 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     protected $bomFile;
 
     /**
+     * @var \stdClass
+     */
+    protected $bomData;
+
+    /**
      * @var string
      */
     protected $sqliteSignature;
@@ -53,6 +58,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         $this->file = $file;
         $this->cloneFile = $this->getCloneFilename($this->file);
         $this->bomFile = $this->getBOMFilename($this->file);
+        $this->bomData = null;
         $this->sqliteSignature = null;
         $this->filesSignature = null;
     }
@@ -190,7 +196,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
      */
     protected function getBOMData(): \stdClass
     {
-        return json_decode($this->filesystem->get($this->bomFile));
+        return $this->bomData ?? ($this->bomData = $this->readBOM());
     }
 
     /**
@@ -249,6 +255,15 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     }
 
     /**
+     * @return \stdClass
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function readBOM(): \stdClass
+    {
+        return json_decode($this->filesystem->get($this->bomFile));
+    }
+
+    /**
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     protected function generateBOM(): void
@@ -257,7 +272,10 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
             'files'  => $this->getFilesSignature(),
             'sqlite' => $this->getSqliteSignature(),
         ];
+
         $this->filesystem->put($this->bomFile, json_encode($data));
+
+        $this->bomData = (object)$data;
     }
 
     /**
