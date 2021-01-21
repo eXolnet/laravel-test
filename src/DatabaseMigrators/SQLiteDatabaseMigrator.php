@@ -165,11 +165,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
      */
     protected function filesSignatureMatches(): bool
     {
-        $signature = $this->getFilesSignature();
-
-        $data = $this->getBOMData();
-
-        return $signature === $data->files;
+        return $this->getFilesSignature() === $this->getBOMData()->files;
     }
 
     /**
@@ -182,11 +178,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
             return false;
         }
 
-        $cloneFileHash = $this->getSqliteSignature();
-
-        $data = $this->getBOMData();
-
-        return $cloneFileHash === $data->sqlite;
+        return $this->getSqliteSignature() === $this->getBOMData()->sqlite;
     }
 
     /**
