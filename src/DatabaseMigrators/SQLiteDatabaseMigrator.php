@@ -30,6 +30,16 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     protected $cloneFile;
 
     /**
+     * @var string
+     */
+    protected $sqliteSignature;
+
+    /**
+     * @var string
+     */
+    protected $filesSignature;
+
+    /**
      * @param string $file
      */
     public function __construct(string $file)
@@ -37,6 +47,8 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
         $this->filesystem = new Filesystem();
         $this->file = $file;
         $this->cloneFile = $this->getCloneFilename($this->file);
+        $this->sqliteSignature = null;
+        $this->filesSignature = null;
     }
 
     /**
@@ -72,8 +84,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
      */
     protected function initialMigration()
     {
-        $signature = $this->calculateFilesSignature();
-        if ($this->canReuseClone($signature)) {
+        if ($this->canReuseClone()) {
             $this->restore();
             return;
         }
@@ -87,7 +98,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
 
         $this->filesystem->copy($this->file, $this->cloneFile);
 
-        $this->generateBOM($signature);
+        $this->generateBOM();
     }
 
     /**
@@ -121,13 +132,12 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     }
 
     /**
-     * @param string $signature
      * @return bool
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    protected function canReuseClone(string $signature): bool
+    protected function canReuseClone(): bool
     {
-        return $this->bomFileExists() && $this->sqliteSignatureMatches() && $this->signatureMatches($signature);
+        return $this->bomFileExists() && $this->sqliteSignatureMatches() && $this->filesSignatureMatches();
     }
 
     /**
@@ -141,12 +151,13 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     }
 
     /**
-     * @param string $signature
      * @return bool
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    protected function signatureMatches(string $signature): bool
+    protected function filesSignatureMatches(): bool
     {
+        $signature = $this->getFilesSignature();
+
         $data = $this->getBOMData();
 
         return $signature === $data->files;
@@ -162,7 +173,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
             return false;
         }
 
-        $cloneFileHash = $this->hashFile($this->cloneFile);
+        $cloneFileHash = $this->getSqliteSignature();
 
         $data = $this->getBOMData();
 
@@ -176,7 +187,35 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     protected function getBOMData(): \stdClass
     {
         $bomFilename = $this->getBOMFilename($this->file);
+
         return json_decode($this->filesystem->get($bomFilename));
+    }
+
+    /**
+     * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function getSqliteSignature(): string
+    {
+        return $this->sqliteSignature ?? ($this->sqliteSignature = $this->calculateSqliteSignature());
+    }
+
+    /**
+     * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function getFilesSignature(): string
+    {
+        return $this->filesSignature ?? ($this->filesSignature = $this->calculateFilesSignature());
+    }
+
+    /**
+     * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
+    protected function calculateSqliteSignature(): string
+    {
+        return $this->hashFile($this->cloneFile);
     }
 
     /**
@@ -208,14 +247,13 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
     }
 
     /**
-     * @param string $signature
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    protected function generateBOM(string $signature): void
+    protected function generateBOM(): void
     {
         $data = [
-            'files'  => $signature,
-            'sqlite' => $this->hashFile($this->cloneFile),
+            'files'  => $this->getFilesSignature(),
+            'sqlite' => $this->getSqliteSignature(),
         ];
         $this->filesystem->put($this->getBOMFilename($this->file), json_encode($data));
     }
