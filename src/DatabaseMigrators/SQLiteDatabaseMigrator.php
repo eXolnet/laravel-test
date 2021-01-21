@@ -186,7 +186,7 @@ class SQLiteDatabaseMigrator extends DatabaseMigrator
      */
     protected function calculateFilesSignature(): string
     {
-        $files = glob(App::basePath('database/{migrations,seeds}/*.php'), GLOB_BRACE);
+        $files = glob(App::basePath('database/{migrations,seeds,seeders}/*.php'), GLOB_BRACE);
 
         $signature = '';
         foreach ($files as $file) {
