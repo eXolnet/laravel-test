@@ -42,13 +42,11 @@ class DatabaseMigrator
      */
     public function seedTestData(): void
     {
-        /* eslint-disable */
         if (! file_exists(App::basePath('database/seeds/TestSeeder.php')) &&
             ! file_exists(App::basePath('database/seeders/TestSeeder.php'))
         ) {
             return;
         }
-        /* eslint-enable */
 
         Artisan::call('db:seed', ['--class' => 'TestSeeder']);
     }
