@@ -27,7 +27,7 @@
         }
     ],
     "require": {
-        "php": ">=7.3",
+        "php": "^7.3|^8.0",
         "ext-json": "*",
         "fakerphp/faker": "^1.6",
         "laravel/browser-kit-testing": "^5.0|^6.0",
