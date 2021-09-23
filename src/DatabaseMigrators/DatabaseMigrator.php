@@ -42,8 +42,7 @@ class DatabaseMigrator
      */
     public function seedTestData(): void
     {
-        if ( // eslint-disable-line
-            ! file_exists(App::basePath('database/seeds/TestSeeder.php')) && // eslint-disable-line
+        if (! file_exists(App::basePath('database/seeds/TestSeeder.php')) && // eslint-disable-line
             ! file_exists(App::basePath('database/seeders/TestSeeder.php')) // eslint-disable-line
         ) { // eslint-disable-line
             return;
