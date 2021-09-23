@@ -42,12 +42,10 @@ class DatabaseMigrator
      */
     public function seedTestData(): void
     {
-        // eslint-disable-next-line
-        if (
-            // eslint-disable-next-line
-            ! file_exists(App::basePath('database/seeds/TestSeeder.php')) &&
-            ! file_exists(App::basePath('database/seeders/TestSeeder.php'))
-        ) {
+        if ( // eslint-disable-line
+            ! file_exists(App::basePath('database/seeds/TestSeeder.php')) && // eslint-disable-line
+            ! file_exists(App::basePath('database/seeders/TestSeeder.php')) // eslint-disable-line
+        ) { // eslint-disable-line
             return;
         }
 
