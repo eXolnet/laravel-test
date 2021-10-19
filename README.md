@@ -11,13 +11,13 @@ Extends Laravel’s TestCase to accelerate the SQLite database creation by using
 
 Require this package with composer:
 
-```
+```bash
 composer require --dev exolnet/laravel-test
 ```
 
 In your application `TestCase`, extends the package’s `TestCase` instead of Laravel’s version.
 
-```
+```php
 use Exolnet\Test\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
@@ -35,7 +35,7 @@ to restore it faster. This is useful if your migration process is slow.
 
 To run the PHPUnit tests, please use:
 
-``` bash
+```bash
 composer test
 ```
 
